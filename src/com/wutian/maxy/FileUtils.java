@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,7 +92,7 @@ public class FileUtils {
 
     public static Map<String, String> readStringToMap(File file) {
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
@@ -152,11 +153,11 @@ public class FileUtils {
                 if (targetMap.containsKey(key)) {
                     if (targetMap.get(key).equals(originMap.get(key)))
                         continue;
-                    else {
-                        writer.write(targetMap.get(key));
-                        writer.flush();
-                        writer.newLine();
-                    }
+                    // else {
+                    // writer.write(targetMap.get(key));
+                    // writer.flush();
+                    // writer.newLine();
+                    // }
                 }
                 writer.write("    " + originMap.get(key));
                 writer.flush();
@@ -301,6 +302,56 @@ public class FileUtils {
                 writer.flush();
                 writer.newLine();
             }
+        }
+    }
+
+    public static void deleteOriginFile(String path) {
+        Map<String, String> map = ValuesData.getAllData();
+        File file = new File(path);
+        if (!file.exists() || !file.isDirectory())
+            return;
+        for (File f : file.listFiles()) {
+            if (f.isDirectory()) {
+                deleteOriginFile(f.getAbsolutePath());
+
+            } else {
+                if (map.containsKey(file.getName()))
+                    f.delete();
+            }
+
+        }
+
+        if (file.listFiles().length == 0)
+            file.delete();
+    }
+
+    public static void deleteSpecialFile(String path, String sepcialName) {
+        File f = new File(path);
+        if (!f.exists())
+            return;
+        for (File file : f.listFiles()) {
+            if (file.isDirectory())
+                deleteSpecialFile(file.getAbsolutePath(), sepcialName);
+            else {
+                if (sepcialName.equals(file.getName()))
+                    file.delete();
+            }
+
+        }
+    }
+
+    public static void deleteFileExcept(String path,String exceptFile) {
+        File file = new File(path);
+        if (!file.exists())
+            return;
+        for (File f : file.listFiles()) {
+            if (f.isDirectory())
+                deleteFileExcept(f.getAbsolutePath(),exceptFile);
+            else {
+                if (!exceptFile.equals(f.getName()))
+                    f.delete();
+            }
+            
         }
     }
 }

@@ -79,23 +79,7 @@ public class FrameStarter implements ButtonClickInterface {
 
     @Override
     public void deleteOriginFile(String path) {
-        Map<String, String> map = ValuesData.getAllData();
-        File file = new File(path);
-        if (!file.exists() || !file.isDirectory())
-            return;
-        for (File f : file.listFiles()) {
-            if (f.isDirectory()) {
-                deleteOriginFile(f.getAbsolutePath());
-
-            } else {
-                if (map.containsKey(file.getName()))
-                    f.delete();
-            }
-
-        }
-
-        if (file.listFiles().length == 0)
-            file.delete();
+        FileUtils.deleteOriginFile(path);
     }
 
     private static void startCopy(String targetPath, File file) {
@@ -132,21 +116,26 @@ public class FrameStarter implements ButtonClickInterface {
 
                 @Override
                 public void run() {
-                    File f = new File(targetFile, file.getName());
-                    if (!f.exists())
-                        return;
+                    if (file.isDirectory()) {
+                        compareFile(originFile + "//" + file.getName(), targetPath + "//" + file.getName(), savePath);
 
-                    FileUtils.compareFile(file, f, saveFile);
+                    } else {
+                        File f = new File(targetFile, file.getName());
+                        if (!f.exists())
+                            return;
+
+                        FileUtils.compareFile(file, f, saveFile);
+                    }
                 }
             });
         }
 
-        fixedThreadPool.shutdown();
-        while (true) {
-            if (fixedThreadPool.isTerminated()) {
-                frame.showDialog("SUCCESS OVER");
-                break;
-            }
-        }
+        // fixedThreadPool.shutdown();
+        // while (true) {
+        // if (fixedThreadPool.isTerminated()) {
+        // frame.showDialog("SUCCESS OVER");
+        // break;
+        // }
+        // }
     }
 }
