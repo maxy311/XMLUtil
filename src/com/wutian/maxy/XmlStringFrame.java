@@ -212,7 +212,7 @@ public class XmlStringFrame extends JFrame {
 
         // add origin
         JLabel originLabel = new JLabel();
-        originLabel.setText("原始目录");
+        originLabel.setText("代码copy路径");
         originLabel.setBounds(20, 50, 100, 40);
         panel.add(originLabel);
 
@@ -220,7 +220,7 @@ public class XmlStringFrame extends JFrame {
         originFile.setBounds(80, 50, 300, 40);
         panel.add(originFile);
 
-        JButton fileButton = new JButton("选择目录");
+        JButton fileButton = new JButton("代码路径，存放翻译资源");
         fileButton.setBounds(390, 50, 80, 40);
         fileButton.addActionListener(selectListener);
         fileButton.setActionCommand(ORIGIN_SELECT);

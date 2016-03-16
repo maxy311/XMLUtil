@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +57,7 @@ public class FileUtils {
         if (mapPath == null || mapPath.length() == 0)
             return null;
 
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new LinkedHashMap<String, String>();
         BufferedReader reader = null;
         try {
             File file = new File(mapPath);
@@ -74,6 +73,59 @@ public class FileUtils {
                     continue;
 
                 map.put(strs[0].trim(), line.trim());
+            }
+            return map;
+        } catch (FileNotFoundException e) {
+            return null;
+        } catch (IOException e) {
+            return null;
+        } finally {
+            try {
+                if (reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // read all string to a Map
+    public static Map<String, String> readAllStringToMap(String mapPath) {
+        if (mapPath == null || mapPath.length() == 0)
+            return null;
+
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        BufferedReader reader = null;
+        try {
+            File file = new File(mapPath);
+            if (!file.exists())
+                return map;
+            reader = new BufferedReader(new FileReader(file));
+            String line = null;
+            StringBuffer buffer = new StringBuffer();
+            boolean flag = true;
+            while ((line = reader.readLine()) != null) {
+
+                if (line.contains("translatable = \"false\""))
+                    continue;
+                if (line.trim().startsWith("<plurals"))
+                    flag = false;
+
+                if (line.trim().startsWith("</plurals>")) {
+                    buffer.append("\n" + line);
+                    String strs[] = buffer.toString().split(">");
+                    map.put(strs[0].trim(), buffer.toString());
+                    flag = true;
+                    buffer.setLength(0);
+                    continue;
+                }
+                if (flag) {
+                    String strs[] = line.split(">");
+                    map.put(strs[0].trim(), line);
+                } else {
+                    buffer.append("\n" + line);
+                }
+
             }
             return map;
         } catch (FileNotFoundException e) {
@@ -124,7 +176,7 @@ public class FileUtils {
     public static void compareFile(File file, File f, File saveFile) {
         Map<String, String> originMap = FileUtils.readStringToMap(file);
         Map<String, String> targetMap = FileUtils.readStringToMap(f);
-
+        boolean flag = false;
         if (!saveFile.isDirectory())
             return;
         if (!"values".equals(saveFile.getName())) {
@@ -153,6 +205,7 @@ public class FileUtils {
                 if (targetMap.containsKey(key)) {
                     if (targetMap.get(key).equals(originMap.get(key)))
                         continue;
+                    flag = true;
                     // else {
                     // writer.write(targetMap.get(key));
                     // writer.flush();
@@ -176,7 +229,10 @@ public class FileUtils {
                 System.out.println(e.toString());
             }
         }
-        tryToAddZhString(file, saveFile.getParentFile().getParentFile(), selectKeys);
+        if (flag)
+            tryToAddZhString(file, saveFile.getParentFile().getParentFile(), selectKeys);
+        else
+            saveFile.delete();
     }
 
     private static void tryToAddZhString(File file, File saveSrcDir, List<String> selectKeysList) {
@@ -235,6 +291,12 @@ public class FileUtils {
         }
     }
 
+    /*
+     * 
+     * originFile:代码文件 copy
+     * targetFile:代码文件
+     * map:要添加的字符串。
+     */
     public static void writeMapToXML(File originFile, File targetFile, Map<String, String> map) {
         BufferedReader reader = null;
         BufferedWriter writer = null;
@@ -262,7 +324,7 @@ public class FileUtils {
                         String[] strs = line.split("\">");
                         if (strs.length == 2) {
                             if (map.containsKey(strs[0].trim())) {
-                                writer.write(map.get(strs[0].trim()));
+                                writer.write("    " + map.get(strs[0].trim()));
                                 writer.flush();
                                 writer.newLine();
                                 temp.add(strs[0].trim());
@@ -292,13 +354,18 @@ public class FileUtils {
                 return;
             }
         }
-        System.out.println("OVER--->" + targetFile.getName());
+        System.out.println("OVER--->" + targetFile.getParent() +"\\"+ targetFile.getName());
     }
 
     private static void writeMapLeftToXml(BufferedWriter writer, ArrayList<String> temp, Map<String, String> map) throws IOException {
-        for (String str : temp) {
-            if (!map.containsKey(str.trim())) {
-                writer.write(str);
+        Set<String> keys = map.keySet();
+        //添加空行区分。
+        writer.write("");
+        writer.flush();
+        writer.newLine();
+        for (String key : keys) {
+            if (!temp.contains(key)) {
+                writer.write("    " + map.get(key));
                 writer.flush();
                 writer.newLine();
             }
@@ -340,18 +407,19 @@ public class FileUtils {
         }
     }
 
-    public static void deleteFileExcept(String path,String exceptFile) {
+    public static void deleteFileExcept(String path, String exceptFile) {
         File file = new File(path);
         if (!file.exists())
             return;
         for (File f : file.listFiles()) {
             if (f.isDirectory())
-                deleteFileExcept(f.getAbsolutePath(),exceptFile);
+                deleteFileExcept(f.getAbsolutePath(), exceptFile);
             else {
                 if (!exceptFile.equals(f.getName()))
                     f.delete();
             }
-            
+
         }
     }
+
 }

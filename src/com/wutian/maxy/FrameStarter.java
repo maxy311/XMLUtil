@@ -48,6 +48,11 @@ public class FrameStarter implements ButtonClickInterface {
 
     }
 
+    /*
+     * originpath:代码copy路径
+     * targetPaht:代码文件路径，存放翻译资源
+     * 
+     * */
     @Override
     public void startCopyValue(String originPath, String targetPath) {
         File originFile = new File(originPath);
@@ -82,6 +87,11 @@ public class FrameStarter implements ButtonClickInterface {
         FileUtils.deleteOriginFile(path);
     }
 
+    /*
+     * targetPath:代码文件路径
+     * file:代码文件copy
+     * 
+     * */
     private static void startCopy(String targetPath, File file) {
         try {
             File tarFile = new File(targetPath + "\\" + file.getName());
@@ -112,6 +122,8 @@ public class FrameStarter implements ButtonClickInterface {
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
 
         for (File file : originFile.listFiles()) {
+            if (file.getName().contains("style") || file.getName().contains("dimen") || file.getName().contains("color"))
+                continue;
             fixedThreadPool.execute(new Runnable() {
 
                 @Override
