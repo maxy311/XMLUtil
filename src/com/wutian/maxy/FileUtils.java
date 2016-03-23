@@ -148,15 +148,37 @@ public class FileUtils {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
+            StringBuffer sb = new StringBuffer();
             String line = null;
+            String str = "";
             while ((line = reader.readLine()) != null) {
                 if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->"))
                     continue;
-                String strs[] = line.split("\">");
-                if (strs.length != 2)
-                    continue;
 
-                map.put(strs[0].trim(), line.trim());
+                if (line.contains("plurals") || line.contains("<item quantity")) {
+                    if (line.contains("plurals")) {
+                        if (line.trim().startsWith("<plurals")) {
+                            str = line.trim();
+                            sb.append(line.trim());
+                        } else if (line.trim().startsWith("</plurals>")) {
+                            sb.append("\n" + "    " + line.trim());
+                            map.put(str, sb.toString());
+                            if ("".equals(str))
+                                System.out.println("errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror");
+                            str = "";
+                            sb.setLength(0);
+                        }
+                    } else if (line.contains("<item quantity")) {
+                        sb.append("\n" + "        " + line.trim());
+                    }
+                } else {
+                    String strs[] = line.split("\">");
+                    if (strs.length != 2)
+                        continue;
+
+                    map.put(strs[0].trim(), line.trim());
+                }
+
             }
             return map;
         } catch (FileNotFoundException e) {

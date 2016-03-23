@@ -1,126 +1,147 @@
 package com.wutian.maxy.standard;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import com.wutian.maxy.FileUtils;
-import com.wutian.maxy.ValuesData;
+import com.wutian.maxy.xml.change.XMLUtils;
 
 /*
  * 英文为标准，读取到一个map 中，
  * 读取其他文件到map
  * 写文件，按钮英文的顺序写到文件，如果没有用应为代替。
  * 
+ * 1.res 目录保留除英文外37国语言
+ * 2.res2 目录存放 英文values
+ * 
+ * 
+ * 
+ * 
  * */
 public class StandardXML {
 
+    private static int count = 0;
+
     public static void main(String[] args) {
-
-        String path = "C:\\workspaces\\App\\res\\values\\share_strings.xml";
-        // String path2 = "C:\\workspaces\\App\\res\\values-zh-rHK\\share_strings.xml";
-
-        path = "C:\\workspaces\\App\\res\\values";
-        dealPaht(path);
-
+        // res2 values 目录
+        String enPath = "C:\\workspaces\\App\\res2\\values";
+        // res 目录
+        String valuePaht = "C:\\workspaces\\App\\res";
+        dealPath(enPath, valuePaht);
     }
 
     /*
-     * path = "C:\\workspaces\\App\\res\\values\\";
-     * path2 = "C:\\workspaces\\App\\res\\values-zh-rHK\\";
+     * //res2 values 目录
+     * // res 目录
      */
-    private static void dealPaht(String valuePath) {
-        File valueDir = new File(valuePath);
-        if (!valueDir.exists())
-            return;
-        dealPaht(valueDir);
+    private static void dealPath(String enPath, String valuePaht) {
+        File enFiles = new File(enPath);
+
+        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+
+        for (File file : enFiles.listFiles()) {
+            fixedThreadPool.execute(
+                    new Runnable() {
+
+                        @Override
+                        public void run() {
+                            File valueFile = new File(valuePaht);
+                            String fileName = file.getName();
+                            for (File dirFile : valueFile.listFiles()) {
+                                if (!dirFile.isDirectory())
+                                    continue;
+                                else {
+                                    File f = new File(dirFile, fileName);
+
+                                    if (!f.exists())
+                                        continue;
+                                    startStandardXML(file, f);
+                                }
+                            }
+                        }
+                    });
+        }
     }
 
     /*
+     * file values/xx
      * 
-     * 
-     * */
-    private static void dealPaht(File valueDir) {
-        String valuePath = "";
-        String otherPath = "";
-        HashMap<String, String> valuesMap = null;
-        HashMap<String, String> otherMap;
-        for (File file : valueDir.listFiles()) {
-            if (file.isDirectory())
-                continue;
-            if (!file.getName().contains("string"))
-                continue;
-            Set<String> dirs = ValuesData.getAllValueData().keySet();
-            for (String dir : dirs) {
-                valuePath = valueDir.getAbsolutePath() + "\\" + file.getName();
-                otherPath = valueDir.getParentFile().getAbsolutePath() + "\\" + dir + "\\" + file.getName();
-                if (valuesMap == null || valuesMap.size() == 0)
-                    valuesMap = (HashMap<String, String>)FileUtils.readAllStringToMap(valuePath);
-                otherMap = (HashMap<String, String>)FileUtils.readAllStringToMap(otherPath);
-                if (otherMap == null || otherMap.size() == 0)
-                    continue;
-                writerStandardXML(valuesMap, otherMap, otherPath);
-                valuesMap.clear();
-                otherMap.clear();
+     * targetFile values-xx/xx
+     */
+    protected static void startStandardXML(File file, File targetFile) {
+        System.out.println(file.getName() + "----" + (count++) + "----" + targetFile.getPath());
+        Map<String, String> map = XMLUtils.readStringToMap(targetFile);
+        Set<String> keys = map.keySet();
 
-                if (file.getName().contains("help_string")) {
-                    File f = new File(otherPath);
-                    if (f.exists())
-                        f.delete();
-                }
-                    
-                
-            }
-        }
-    }
-
-    private static void writerStandardXML(HashMap<String, String> valuesMap, HashMap<String, String> otherMap, String path2) {
-        if (valuesMap.size() == 0)
-            return;
-        File file = new File(path2);
-
-        try {
-            if (!file.exists())
-                file.createNewFile();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        boolean ignoreNotTrans = false;
+        if (targetFile.getParent().contains("values-zh-"))
+            ignoreNotTrans = false;
+        else
+            ignoreNotTrans = true;
+        BufferedReader reader = null;
         BufferedWriter writer = null;
+
         try {
-            writer = new BufferedWriter(new FileWriter(file));
-            // writer.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            // writer.newLine();
-            // writer.write("<resources>");
-            // writer.flush();
-            // writer.newLine();
-
-            Set<String> valuesKey = valuesMap.keySet();
-
-            for (String key : valuesKey) {
-                String ss = "";
-                if (otherMap.containsKey(key))
-                    ss = otherMap.get(key);
-                else
-                    ss = valuesMap.get(key);
-                writer.write(ss);
-                writer.flush();
-                writer.newLine();
+            reader = new BufferedReader(new FileReader(file));
+            writer = new BufferedWriter(new FileWriter(targetFile));
+            String line = null;
+            String str = "";
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->")) {
+                    writer.write(line);
+                    writer.flush();
+                    writer.newLine();
+                } else if (line.contains("plurals") || line.contains("<item quantity")) {
+                    if (line.contains("<item quantity"))
+                        continue;
+                    else {
+                        if (line.trim().startsWith("<plurals")) {
+                            str = line.trim();
+                        } else if (line.trim().startsWith("</plurals>")) {
+                            writer.write("    " + map.get(str));
+                            writer.flush();
+                            writer.newLine();
+                            if ("".equals(str))
+                                System.out.println("errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror");
+                            str = "";
+                        }
+                    }
+                } else if (ignoreNotTrans && (line.contains("translate=\"false\"") || line.contains("translatable=\"false\""))) {
+                    continue;
+                } else {
+                    String strs[] = line.trim().split("\">");
+                    if (keys.contains(strs[0])) {
+                        writer.write("    " + map.get(strs[0]));
+                        writer.flush();
+                        writer.newLine();
+                    } else {
+                        writer.write(line);
+                        writer.flush();
+                        writer.newLine();
+                    }
+                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println(e.toString());
         } finally {
             try {
-                if (writer != null)
-                    writer.close();
+                reader.close();
             } catch (IOException e) {
-                System.out.println(e.toString());
+                e.printStackTrace();
+            }
+
+            try {
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
-
     }
-
 }
