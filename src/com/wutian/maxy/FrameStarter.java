@@ -2,9 +2,12 @@ package com.wutian.maxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class FrameStarter implements ButtonClickInterface {
     private static XmlStringFrame frame = null;
@@ -20,31 +23,26 @@ public class FrameStarter implements ButtonClickInterface {
         Map<String, String> map = ValuesData.getAllData();
         File file = new File(path);
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+        List<Future<?>> futures = new ArrayList<>();
         for (File f : file.listFiles()) {
-            fixedThreadPool.execute(new Runnable() {
+            Future<?> future = fixedThreadPool.submit(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        if (f.isDirectory())
-                            reNameFile(f.getAbsolutePath());
-                        else {
-                            String ph = file.getName();
-                            if (map.containsKey(ph)) {
-                                File fl = new File(file.getParentFile().getAbsolutePath() + "\\" + map.get(ph));
-                                if (!fl.exists())
-                                    fl.mkdirs();
-                                File f2 = new File(fl, f.getName());
-                                if (!f2.exists())
-                                    f2.createNewFile();
-                                FileUtils.copyFile(f, f2);
-                            } else
-                                System.out.println(ph + "----cann't find !");
+                        if (!f.isDirectory())
+                            return;
+                        String name = f.getName();
+                        if (map.containsKey(name)) {
+                            File targetFile = new File(file, map.get(name));
+                            f.renameTo(targetFile);
                         }
-                    } catch (IOException e) {}
+                    } catch (Exception e) {}
 
                 }
             });
+            futures.add(future);
         }
+        endThreadPool(fixedThreadPool, futures);
 
     }
 
@@ -149,5 +147,34 @@ public class FrameStarter implements ButtonClickInterface {
         // break;
         // }
         // }
+    }
+    
+    public static void endThreadPool(ExecutorService threadPool, List<Future<?>> futures) {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (true) {
+                    int i = 0;
+                    try {
+                        for (Future<?> future : futures) {
+                            if (future.isDone()) {
+                                i++;
+                                continue;
+                            } else
+                                break;
+                        }
+
+                        if (i == futures.size()) {
+                            threadPool.shutdownNow();
+                            break;
+                        }
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 }

@@ -14,14 +14,13 @@ import java.util.Map;
 import java.util.Set;
 
 public class FileUtils {
-
-    public static void copyFile(File f1, File f2) {
+    public static void copyFile(File originFile, File targetFile) {
         BufferedReader reader = null;
         BufferedWriter writer = null;
 
         try {
-            reader = new BufferedReader(new FileReader(f1));
-            writer = new BufferedWriter(new FileWriter(f2));
+            reader = new BufferedReader(new FileReader(originFile));
+            writer = new BufferedWriter(new FileWriter(targetFile));
             String line = null;
             while (true) {
                 line = reader.readLine();
@@ -38,7 +37,6 @@ public class FileUtils {
                 if (reader != null)
                     reader.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -46,105 +44,20 @@ public class FileUtils {
                 if (writer != null)
                     writer.close();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
     }
 
     // read string to a Map
-    public static Map<String, String> readStringToMap(String mapPath) {
-        if (mapPath == null || mapPath.length() == 0)
-            return null;
-
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        BufferedReader reader = null;
-        try {
-            File file = new File(mapPath);
-            if (!file.exists())
-                return map;
-            reader = new BufferedReader(new FileReader(file));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->"))
-                    continue;
-                String strs[] = line.split("\">");
-                if (strs.length != 2)
-                    continue;
-
-                map.put(strs[0].trim(), line.trim());
-            }
-            return map;
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                if (reader != null)
-                    reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    // read all string to a Map
-    public static Map<String, String> readAllStringToMap(String mapPath) {
-        if (mapPath == null || mapPath.length() == 0)
-            return null;
-
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        BufferedReader reader = null;
-        try {
-            File file = new File(mapPath);
-            if (!file.exists())
-                return map;
-            reader = new BufferedReader(new FileReader(file));
-            String line = null;
-            StringBuffer buffer = new StringBuffer();
-            boolean flag = true;
-            while ((line = reader.readLine()) != null) {
-
-                if (line.contains("translatable = \"false\""))
-                    continue;
-                if (line.trim().startsWith("<plurals"))
-                    flag = false;
-
-                if (line.trim().startsWith("</plurals>")) {
-                    buffer.append("\n" + line);
-                    String strs[] = buffer.toString().split(">");
-                    map.put(strs[0].trim(), buffer.toString());
-                    flag = true;
-                    buffer.setLength(0);
-                    continue;
-                }
-                if (flag) {
-                    String strs[] = line.split(">");
-                    map.put(strs[0].trim(), line);
-                } else {
-                    buffer.append("\n" + line);
-                }
-
-            }
-            return map;
-        } catch (FileNotFoundException e) {
-            return null;
-        } catch (IOException e) {
-            return null;
-        } finally {
-            try {
-                if (reader != null)
-                    reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    public static Map<String, String> readStringToMap(String filePath) {
+        return readStringToMap(new File(filePath));
     }
 
     public static Map<String, String> readStringToMap(File file) {
-
         Map<String, String> map = new LinkedHashMap<String, String>();
+        if (file == null || !file.exists())
+            return map;
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
@@ -228,11 +141,6 @@ public class FileUtils {
                     if (targetMap.get(key).equals(originMap.get(key)))
                         continue;
                     flag = true;
-                    // else {
-                    // writer.write(targetMap.get(key));
-                    // writer.flush();
-                    // writer.newLine();
-                    // }
                 }
                 writer.write("    " + originMap.get(key));
                 writer.flush();
@@ -376,12 +284,12 @@ public class FileUtils {
                 return;
             }
         }
-        System.out.println("OVER--->" + targetFile.getParent() +"\\"+ targetFile.getName());
+        System.out.println("OVER--->" + targetFile.getParent() + "\\" + targetFile.getName());
     }
 
     private static void writeMapLeftToXml(BufferedWriter writer, ArrayList<String> temp, Map<String, String> map) throws IOException {
         Set<String> keys = map.keySet();
-        //添加空行区分。
+        // 添加空行区分。
         writer.write("");
         writer.flush();
         writer.newLine();
@@ -444,4 +352,47 @@ public class FileUtils {
         }
     }
 
+    public static List<String> readXml(String path) {
+        return readXml(new File(path));
+    }
+
+    public static List<String> readXml(File file) {
+        ArrayList<String> lines = new ArrayList<>();
+        if (file == null || !file.exists())
+            return lines;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line = "";
+            StringBuffer sb = new StringBuffer();
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("plurals") || line.contains("<item quantity")) {
+                    if (line.contains("plurals")) {
+                        if (line.trim().startsWith("<plurals"))
+                            sb.append(line);
+                        else if (line.trim().startsWith("</plurals>")) {
+                            sb.append("\n" + line);
+                            lines.add(sb.toString());
+                            sb.setLength(0);
+                        }
+                    } else if (line.contains("<item quantity")) {
+                        sb.append("\n" + line);
+                    }
+                } else
+                    lines.add(line);
+            }
+        } catch (FileNotFoundException e) {
+            return lines;
+        } catch (IOException e) {
+            return lines;
+        } finally {
+            try {
+                if (reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return lines;
+    }
 }
