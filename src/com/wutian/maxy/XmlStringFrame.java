@@ -181,21 +181,6 @@ public class XmlStringFrame extends JFrame {
         });
         panel.add(renameButton);
 
-        // add Delete Button
-        JButton deleteButton = new JButton("Delete");
-        deleteButton.setBounds(200, 350, 100, 40);
-        deleteButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String str = renameFile.getText().trim();
-                if (str.equals("") || str == null)
-                    showDirNull();
-                if (listener != null)
-                    listener.deleteOriginFile(str);
-            }
-        });
-        panel.add(deleteButton);
         // 将标签面板加入到选项卡面板对象上
         tabbedPane.addTab("Rename", null, panel, "First panel");
     }
@@ -212,7 +197,7 @@ public class XmlStringFrame extends JFrame {
 
         // add origin
         JLabel originLabel = new JLabel();
-        originLabel.setText("代码copy路径");
+        originLabel.setText("Res路径");
         originLabel.setBounds(20, 50, 100, 40);
         panel.add(originLabel);
 
@@ -220,7 +205,7 @@ public class XmlStringFrame extends JFrame {
         originFile.setBounds(80, 50, 300, 40);
         panel.add(originFile);
 
-        JButton fileButton = new JButton("代码路径，存放翻译资源");
+        JButton fileButton = new JButton("选择目录");
         fileButton.setBounds(390, 50, 80, 40);
         fileButton.addActionListener(selectListener);
         fileButton.setActionCommand(ORIGIN_SELECT);
@@ -228,7 +213,7 @@ public class XmlStringFrame extends JFrame {
 
         // add target
         JLabel targetLabel = new JLabel();
-        targetLabel.setText("目标目录");
+        targetLabel.setText("翻译资源");
         targetLabel.setBounds(20, 100, 100, 40);
         panel.add(targetLabel);
 
@@ -254,7 +239,7 @@ public class XmlStringFrame extends JFrame {
                 String targetPath = targetFile.getText().trim();
                 if ("".equals(originPath) || "".equals(targetPath))
                     showDirNull();
-                listener.startCopyValue(originPath, targetPath);
+                listener.addTranslateToValues(originPath, targetPath);
             }
         });
         panel.add(startButton);

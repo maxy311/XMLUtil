@@ -1,17 +1,18 @@
 package com.wutian.maxy.standard;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import com.wutian.maxy.xml.change.XMLUtils;
+import com.wutian.maxy.FileUtils;
 
 /*
  * 英文为标准，读取到一个map 中，
@@ -22,16 +23,12 @@ import com.wutian.maxy.xml.change.XMLUtils;
  * 2.res2 目录存放 英文values
  * 
  * 
- * 
- * 
  * */
 public class StandardXML {
 
-    private static int count = 0;
-
     public static void main(String[] args) {
         // res2 values 目录
-        String enPath = "C:\\workspaces\\App\\res2\\values";
+        String enPath = "C:\\workspaces\\App\\res\\values";
         // res 目录
         String valuePaht = "C:\\workspaces\\App\\res";
         dealPath(enPath, valuePaht);
@@ -45,16 +42,24 @@ public class StandardXML {
         File enFiles = new File(enPath);
 
         ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
-
+        List<Future<?>> futures = new ArrayList<>();
         for (File file : enFiles.listFiles()) {
-            fixedThreadPool.execute(
+            String name = file.getName();
+            if (name.contains("dimen") || name.contains("style") || name.contains("attr") || name.contains("color") || name.contains("id"))
+                continue;
+
+            Future<?> future = fixedThreadPool.submit(
                     new Runnable() {
 
                         @Override
                         public void run() {
                             File valueFile = new File(valuePaht);
                             String fileName = file.getName();
+                            List<String> lines = FileUtils.readXml(file);
                             for (File dirFile : valueFile.listFiles()) {
+                                if (!dirFile.getName().contains("value") || dirFile.getName().equals("values"))
+                                    continue;
+
                                 if (!dirFile.isDirectory())
                                     continue;
                                 else {
@@ -62,12 +67,14 @@ public class StandardXML {
 
                                     if (!f.exists())
                                         continue;
-                                    startStandardXML(file, f);
+                                    startStandardXML(lines, f);
                                 }
                             }
                         }
                     });
+            futures.add(future);
         }
+        FileUtils.endThreadPool(fixedThreadPool, futures);
     }
 
     /*
@@ -75,9 +82,8 @@ public class StandardXML {
      * 
      * targetFile values-xx/xx
      */
-    protected static void startStandardXML(File file, File targetFile) {
-        System.out.println(file.getName() + "----" + (count++) + "----" + targetFile.getPath());
-        Map<String, String> map = XMLUtils.readStringToMap(targetFile);
+    protected static void startStandardXML(List<String> lines, File targetFile) {
+        Map<String, String> map = FileUtils.readStringToMap(targetFile);
         Set<String> keys = map.keySet();
 
         boolean ignoreNotTrans = false;
@@ -85,60 +91,35 @@ public class StandardXML {
             ignoreNotTrans = false;
         else
             ignoreNotTrans = true;
-        BufferedReader reader = null;
         BufferedWriter writer = null;
 
         try {
-            reader = new BufferedReader(new FileReader(file));
             writer = new BufferedWriter(new FileWriter(targetFile));
-            String line = null;
-            String str = "";
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->")) {
-                    writer.write(line);
-                    writer.flush();
-                    writer.newLine();
-                } else if (line.contains("plurals") || line.contains("<item quantity")) {
-                    if (line.contains("<item quantity"))
-                        continue;
-                    else {
-                        if (line.trim().startsWith("<plurals")) {
-                            str = line.trim();
-                        } else if (line.trim().startsWith("</plurals>")) {
-                            writer.write("    " + map.get(str));
-                            writer.flush();
-                            writer.newLine();
-                            if ("".equals(str))
-                                System.out.println("errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror");
-                            str = "";
-                        }
-                    }
-                } else if (ignoreNotTrans && (line.contains("translate=\"false\"") || line.contains("translatable=\"false\""))) {
+            for (String line : lines) {
+                if (ignoreNotTrans && (line.contains("translate") || line.contains("translatable") || line.contains("<!-- Only show in CN version ,don't translation-->")))
                     continue;
-                } else {
-                    String strs[] = line.trim().split("\">");
+
+                String strs[] = line.trim().split("\">");
+                if (strs.length >= 2) {
                     if (keys.contains(strs[0])) {
                         writer.write("    " + map.get(strs[0]));
                         writer.flush();
                         writer.newLine();
-                    } else {
-                        writer.write(line);
-                        writer.flush();
-                        writer.newLine();
+                        continue;
                     }
                 }
+                writer.write(line);
+                writer.flush();
+                writer.newLine();
+
             }
         } catch (Exception e) {
             System.out.println(e.toString());
         } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
             try {
-                writer.close();
+                if (writer != null)
+                    writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
