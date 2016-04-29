@@ -112,9 +112,8 @@ public class FileUtils {
             }
         }
     }
-
+//values 与 values-ar 比较
     public static void compareFile(File file, File f, File saveFile) {
-        boolean flag = false;
         if (!saveFile.isDirectory())
             return;
         if (!"values".equals(saveFile.getName())) {
@@ -162,12 +161,9 @@ public class FileUtils {
             for (String key : originKeys) {
                 if (key.contains("translate") || key.contains("translatable"))
                     continue;
-                if (targetMap.containsKey(key)) {
-                    //TODO 注释需要测试。
-//                    if (targetMap.get(key).equals(originMap.get(key)))
-                        continue;
-//                        flag = true;
-                }
+                if (targetMap.containsKey(key))
+                    continue;
+
                 writer.write("    " + originMap.get(key));
                 writer.flush();
                 writer.newLine();
@@ -185,11 +181,11 @@ public class FileUtils {
                 System.out.println(e.toString());
             }
         }
-        //TODO need to test
-//        if (flag)
-//            tryToAddZhString(file, saveFile.getParentFile().getParentFile(), selectKeys);
-//        else
-//            saveFile.delete();
+
+        if (!selectKeys.isEmpty())
+            tryToAddZhString(file, saveFile.getParentFile().getParentFile(), selectKeys);
+        else
+            saveFile.delete();
     }
 
     private static void tryToAddZhString(File file, File saveSrcDir, List<String> selectKeysList) {
@@ -298,6 +294,12 @@ public class FileUtils {
             @Override
             public void run() {
                 List<String> lines = FileUtils.readXml(resFile);
+                if (lines.isEmpty()){
+                    File file = new File(resFile.getParentFile().getParentFile().getAbsolutePath() + "\\values\\" + resFile.getName());
+                    if (file.exists())
+                    lines = FileUtils.readXml(file);
+                }
+
                 Map<String, String> map = FileUtils.readStringToMap(translateFile);
                 Set<String> keys = map.keySet();
                 ArrayList<String> temp = new ArrayList<String>();

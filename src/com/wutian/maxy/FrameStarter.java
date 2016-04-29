@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import sun.rmi.runtime.Log;
+
 public class FrameStarter implements ButtonClickInterface {
     private static XmlStringFrame frame = null;
     ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);

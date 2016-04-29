@@ -25,14 +25,19 @@ public class DeleteString {
     private static final String res = "C:\\workspaces\\App\\res";
 
     static {
-//        List<String> ids = new ArrayList<>();
-//        ids.add("<plurals name=\"share_session_trans_detail");
-//        ids.add("<string name=\"share_discover_compatible_apple_device");
-//        DELETE_IDS.put("share_strings.xml", ids);
-
-//        ids = new ArrayList<>();
-//        ids.add("<string name=\"navigation_clean_name");
-//        DELETE_IDS.put("navigation_strings.xml", ids);
+        List<String> ids = new ArrayList<>();
+        ids.add("<string name=\"feed_connect_pc_music_title");
+        ids.add("<string name=\"feed_connect_pc_music_msg");
+        ids.add("<string name=\"feed_connect_pc_music_button_text");
+        
+        ids.add("<string name=\"feed_content_file_title");
+        ids.add("<string name=\"feed_content_file_msg");
+        ids.add("<string name=\"feed_content_file_button_text");
+        
+        ids.add("<string name=\"feed_content_app_title");
+        ids.add("<string name=\"feed_content_app_msg");
+        ids.add("<string name=\"feed_content_app_button_text");
+        DELETE_IDS.put("feed_strings.xml", ids);
     }
 
     public static void main(String[] args) {
