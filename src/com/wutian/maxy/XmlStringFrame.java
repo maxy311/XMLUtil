@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -55,9 +56,63 @@ public class XmlStringFrame extends JFrame {
 
         createComparePannel(tabbedPane);
 
+        createStandardXMl(tabbedPane);
         container.add(tabbedPane);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    private void createStandardXMl(JTabbedPane tabbedPane) {
+        // 创建面板
+        Panel panel = new Panel();
+        panel.setBackground(Color.ORANGE);
+        panel.setLayout(null);
+
+        // 创建标签
+        JLabel label = new JLabel("标准化代码", SwingConstants.CENTER);
+        label.setBounds(150, 0, 200, 40);
+        panel.add(label);
+
+        // add desc
+        JLabel editorPane = new JLabel();
+        editorPane.setText("描述：所有代码与values 保持一致");
+        editorPane.setBounds(150, 50, 200, 40);
+        panel.add(editorPane);
+
+        // add origin
+        JLabel originLabel = new JLabel();
+        originLabel.setText("src目录");
+        originLabel.setBounds(20, 100, 100, 40);
+        panel.add(originLabel);
+
+        compareOrigin = new JTextField();
+        compareOrigin.setBounds(80, 100, 300, 40);
+        panel.add(compareOrigin);
+
+        JButton fileButton = new JButton("选择目录");
+        fileButton.setBounds(390, 100, 80, 40);
+        fileButton.addActionListener(selectListener);
+        fileButton.setActionCommand(COMPARE_ORIGIN_SELECT);
+        panel.add(fileButton);
+
+        JButton startButton = new JButton("Start");
+        startButton.setBounds(200, 150, 100, 40);
+
+        startButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String originPath = compareOrigin.getText().trim();
+                if ("".equals(originPath))
+                    showDirNull();
+                listener.standardFile(originPath);
+            }
+        });
+        panel.add(startButton);
+
+        // 将标签面板加入到选项卡面板对象上
+        tabbedPane.addTab("Standard", null, panel, "Standard values");
+
     }
 
     private void createComparePannel(JTabbedPane tabbedPane) {
@@ -117,9 +172,15 @@ public class XmlStringFrame extends JFrame {
         fileButton.addActionListener(selectListener);
         fileButton.setActionCommand(COMPARE_SAVE_SELECT);
         panel.add(fileButton);
+
+        // add JCheckBox
+        JCheckBox checkBox = new JCheckBox("values/values-ar Compare");
+        checkBox.setBounds(20, 200, 300, 40);
+        panel.add(checkBox);
+
         // add start Button
         JButton startButton = new JButton("Start");
-        startButton.setBounds(200, 200, 100, 40);
+        startButton.setBounds(200, 250, 100, 40);
 
         startButton.addActionListener(new ActionListener() {
 
@@ -130,7 +191,7 @@ public class XmlStringFrame extends JFrame {
                 String savePath = saveTarget.getText().trim();
                 if ("".equals(originPath) || "".equals(targetPath) || "".equals(savePath))
                     showDirNull();
-                listener.compareFile(originPath, targetPath, savePath);
+                listener.compareFile(originPath, targetPath, savePath, checkBox.isSelected());
             }
         });
         panel.add(startButton);

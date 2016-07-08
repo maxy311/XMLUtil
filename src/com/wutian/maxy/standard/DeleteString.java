@@ -22,22 +22,12 @@ public class DeleteString {
     private static final String FILE_NAME = "";
     private static String DELETE_ID = "";
     private static final Map<String, List<String>> DELETE_IDS = new HashMap<>();
-    private static final String res = "C:\\workspaces\\App\\res";
+    private static final String res = "/Users/maxy/Android/workspace/App/res";
 
     static {
         List<String> ids = new ArrayList<>();
-        ids.add("<string name=\"feed_connect_pc_music_title");
-        ids.add("<string name=\"feed_connect_pc_music_msg");
-        ids.add("<string name=\"feed_connect_pc_music_button_text");
-        
-        ids.add("<string name=\"feed_content_file_title");
-        ids.add("<string name=\"feed_content_file_msg");
-        ids.add("<string name=\"feed_content_file_button_text");
-        
-        ids.add("<string name=\"feed_content_app_title");
-        ids.add("<string name=\"feed_content_app_msg");
-        ids.add("<string name=\"feed_content_app_button_text");
-        DELETE_IDS.put("feed_strings.xml", ids);
+        ids.add("<string name=\"setting_password_version_info");
+        DELETE_IDS.put("setting_strings.xml", ids);
     }
 
     public static void main(String[] args) {

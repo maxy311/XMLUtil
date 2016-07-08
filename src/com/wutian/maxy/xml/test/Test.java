@@ -1,4 +1,4 @@
-package com.wutian.maxy.xml.change;
+package com.wutian.maxy.xml.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

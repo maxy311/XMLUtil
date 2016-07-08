@@ -61,6 +61,10 @@ public class FileUtils {
 
     public static Map<String, String> readStringToMap(File file) {
         Map<String, String> map = new LinkedHashMap<String, String>();
+        return readStringToMap(file, map);
+    }
+
+    public static Map<String, String> readStringToMap(File file, Map<String, String> map) {
         if (file == null || !file.exists())
             return map;
         BufferedReader reader = null;
@@ -111,9 +115,16 @@ public class FileUtils {
                 e.printStackTrace();
             }
         }
+
     }
-//values 与 values-ar 比较
-    public static void compareFile(File file, File f, File saveFile) {
+
+    // values 与 values-ar 比较
+    /*
+     * file : values
+     * f: values-ar
+     * 
+     */
+    public static void compareFile(File file, File f, File saveFile, boolean isCompareAr) {
         if (!saveFile.isDirectory())
             return;
         if (!"values".equals(saveFile.getName())) {
@@ -141,7 +152,6 @@ public class FileUtils {
                     copyFile(zhFile, zhTargetFile);
                 }
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             return;
@@ -159,11 +169,17 @@ public class FileUtils {
             writer.flush();
             writer.newLine();
             for (String key : originKeys) {
-                if (key.contains("translate") || key.contains("translatable"))
+                if (key.contains("translate") || key.contains("translatable") || key.contains("<plurals name="))
                     continue;
-                if (targetMap.containsKey(key))
-                    continue;
-
+                if (isCompareAr) {
+                    // values 与 values-ar 比较
+                    if (targetMap.containsKey(key) && !targetMap.get(key).equals(originMap.get(key)))
+                        continue;
+                } else {
+                    // values 与 values 比较
+                    if (targetMap.containsKey(key) && targetMap.get(key).equals(originMap.get(key)))
+                        continue;
+                }
                 writer.write("    " + originMap.get(key));
                 writer.flush();
                 writer.newLine();
@@ -188,20 +204,15 @@ public class FileUtils {
             saveFile.delete();
     }
 
-    private static void tryToAddZhString(File file, File saveSrcDir, List<String> selectKeysList) {
-
-        if (!"values".equals(file.getParentFile().getName()))
+    private static void tryToAddZhString(File file, File valueSaveDir, List<String> selectKeysList) {
+        File zhDir = new File(file.getParentFile().getParentFile(), "values-zh-rCN");
+        File zhFile = new File(zhDir, file.getName());
+        if (!zhFile.exists())
             return;
-        File zhFile = new File(file.getParentFile().getParentFile().getAbsolutePath() + "\\" + "values-zh" + "\\" + file.getName());
-        if (!zhFile.exists()) {
-            zhFile = new File(file.getParentFile().getParentFile().getAbsolutePath() + "\\" + "values-zh-rCN" + "\\" + file.getName());
-            if (!zhFile.exists())
-                return;
-        }
 
-        File saveDir = new File(saveSrcDir, "values-zh");
+        File saveDir = new File(valueSaveDir, "values-zh");
         if (!saveDir.exists())
-            saveDir.mkdirs();
+            saveDir.mkdir();
 
         File saveFile = new File(saveDir, file.getName());
         try {
@@ -212,7 +223,6 @@ public class FileUtils {
         }
 
         Map<String, String> map = readStringToMap(zhFile);
-
         BufferedWriter writer = null;
 
         try {
@@ -228,7 +238,7 @@ public class FileUtils {
                     writer.flush();
                     writer.newLine();
                 } else
-                    System.out.println(str);
+                    System.out.println("values " + file.getName() + "didn't contains :" + str);
             }
             writer.write("</resources>");
             writer.flush();
@@ -294,10 +304,10 @@ public class FileUtils {
             @Override
             public void run() {
                 List<String> lines = FileUtils.readXml(resFile);
-                if (lines.isEmpty()){
+                if (lines.isEmpty()) {
                     File file = new File(resFile.getParentFile().getParentFile().getAbsolutePath() + "\\values\\" + resFile.getName());
                     if (file.exists())
-                    lines = FileUtils.readXml(file);
+                        lines = FileUtils.readXml(file);
                 }
 
                 Map<String, String> map = FileUtils.readStringToMap(translateFile);
@@ -381,5 +391,75 @@ public class FileUtils {
                 }
             }
         }).start();
+    }
+
+    public static List<String> readStringToList(File file) {
+        ArrayList<String> lines = new ArrayList<>();
+        if (file == null || !file.exists())
+            return lines;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+            String line = "";
+            while ((line = reader.readLine()) != null)
+                lines.add(line);
+        } catch (FileNotFoundException e) {
+            return lines;
+        } catch (IOException e) {
+            return lines;
+        } finally {
+            try {
+                if (reader != null)
+                    reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return lines;
+    }
+
+    protected static void startStandardXML(List<String> lines, File targetFile) {
+        Map<String, String> map = FileUtils.readStringToMap(targetFile);
+        Set<String> keys = map.keySet();
+
+        boolean ignoreNotTrans = false;
+        if (targetFile.getParent().contains("values-zh-"))
+            ignoreNotTrans = false;
+        else
+            ignoreNotTrans = true;
+        BufferedWriter writer = null;
+
+        try {
+            writer = new BufferedWriter(new FileWriter(targetFile));
+            for (String line : lines) {
+                if (ignoreNotTrans && (line.contains("translate") || line.contains("translatable") || line.contains("<!-- Only show in CN version ,don't translation-->")))
+                    continue;
+
+                String strs[] = line.trim().split("\">");
+                if (strs.length >= 2) {
+                    if (keys.contains(strs[0])) {
+                        writer.write("    " + map.get(strs[0]));
+                        writer.flush();
+                        writer.newLine();
+
+                    }
+                    continue;
+                }
+                writer.write(line);
+                writer.flush();
+                writer.newLine();
+
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        } finally {
+
+            try {
+                if (writer != null)
+                    writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -28,9 +28,9 @@ public class StandardXML {
 
     public static void main(String[] args) {
         // res2 values 目录
-        String enPath = "C:\\workspaces\\App\\res\\values";
+        String enPath = "/Users/maxy/Android/workspace/App/res/values";
         // res 目录
-        String valuePaht = "C:\\workspaces\\App\\res";
+        String valuePaht = "/Users/maxy/Android/workspace/App/res";
         dealPath(enPath, valuePaht);
     }
 
@@ -45,9 +45,11 @@ public class StandardXML {
         List<Future<?>> futures = new ArrayList<>();
         for (File file : enFiles.listFiles()) {
             String name = file.getName();
-            if (name.contains("dimen") || name.contains("style") || name.contains("attr") || name.contains("color") || name.contains("id"))
-                continue;
+//            if (name.contains("dimen") || name.contains("style") || name.contains("attr") || name.contains("color") || name.contains("id"))
+//                continue;
 
+            if (!name.contains("dimen"))
+                continue;
             Future<?> future = fixedThreadPool.submit(
                     new Runnable() {
 

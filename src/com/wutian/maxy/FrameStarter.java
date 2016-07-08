@@ -9,11 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import sun.rmi.runtime.Log;
-
 public class FrameStarter implements ButtonClickInterface {
     private static XmlStringFrame frame = null;
     ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+
     public static void main(String[] args) {
         frame = new XmlStringFrame();
         frame.setStartClickListener(new FrameStarter());
@@ -49,7 +48,7 @@ public class FrameStarter implements ButtonClickInterface {
      * originpath:resPath
      * targetPaht:翻译路径
      * 
-     * */
+     */
     @Override
     public void addTranslateToValues(String resPath, String translatePath) {
 
@@ -60,8 +59,8 @@ public class FrameStarter implements ButtonClickInterface {
         if (!translateFile.exists())
             return;
         for (File file : translateFile.listFiles()) {
-            if (file.isDirectory()){
-                File f = new File(originFile ,file.getName());
+            if (file.isDirectory()) {
+                File f = new File(originFile, file.getName());
                 if (!f.exists())
                     continue;
                 addTranslateToValues(f.getAbsolutePath(), file.getAbsolutePath());
@@ -82,9 +81,9 @@ public class FrameStarter implements ButtonClickInterface {
     /*
      * 比较values 目录。
      * 
-     * */
+     */
     @Override
-    public void compareFile(String originPath, String targetPath, String savePath) {
+    public void compareFile(String originPath, String targetPath, String savePath, boolean isCompareAr) {
         File originFile = new File(originPath);
         if (!originFile.exists() || !originFile.isDirectory())
             return;
@@ -108,13 +107,54 @@ public class FrameStarter implements ButtonClickInterface {
                 @Override
                 public void run() {
                     if (file.isDirectory()) {
-                        compareFile(originFile + "//" + file.getName(), targetPath + "//" + file.getName(), savePath);
+                        compareFile(originFile + "//" + file.getName(), targetPath + "//" + file.getName(), savePath, isCompareAr);
                     } else {
                         File f = new File(targetFile, file.getName());
-                        FileUtils.compareFile(file, f, saveFile);
+                        FileUtils.compareFile(file, f, saveFile, isCompareAr);
                     }
                 }
             });
         }
+    }
+
+    @Override
+    public void standardFile(String srcPath) {
+        File srdDir = new File(srcPath);
+        File enDir = new File(srdDir, "values");
+
+        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+        List<Future<?>> futures = new ArrayList<>();
+
+        for (File file : enDir.listFiles()) {
+            String name = file.getName();
+            if (name.contains("dimen") || name.contains("style") || name.contains("attr") || name.contains("color") || name.contains("id"))
+                continue;
+
+            if (!name.contains("string"))
+                continue;
+            Future<?> future = fixedThreadPool.submit(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            List<String> lines = FileUtils.readXml(file);
+                            for (File dirFile : srdDir.listFiles()) {
+                                if (!dirFile.getName().contains("value") || dirFile.getName().equals("values"))
+                                    continue;
+
+                                if (!dirFile.isDirectory())
+                                    continue;
+                                else {
+                                    File f = new File(dirFile, file.getName());
+
+                                    if (!f.exists())
+                                        continue;
+                                    FileUtils.startStandardXML(lines, f);
+                                }
+                            }
+                        }
+                    });
+            futures.add(future);
+        }
+        // FileUtils.endThreadPool(fixedThreadPool, futures);
     }
 }

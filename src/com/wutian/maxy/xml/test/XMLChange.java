@@ -1,4 +1,4 @@
-package com.wutian.maxy.xml.change;
+package com.wutian.maxy.xml.test;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -7,14 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.wutian.maxy.FileUtils;
 
-public class XMLUtils extends FileUtils {
+public class XMLChange extends FileUtils {
 
     private static String MARGIN_LEFT = "android:layout_marginLeft";
     private static String MARGIN_RIGHT = "android:layout_marginRight";
@@ -47,14 +46,14 @@ public class XMLUtils extends FileUtils {
 
     public static void main(String[] args) {
 
-        String path = "C:\\workspaces\\App\\res2";
-        String targetPath = "C:\\workspaces\\App\\res";
-//
+        String path = "C:\\workspaces\\App\\res\\layout2";
+        String targetPath = "C:\\workspaces\\App\\res\\layout";
+
         changeString(path, targetPath);
 
-//         path = "C:\\workspaces\\App\\res\\values2";
-//         targetPath = "C:\\workspaces\\App\\res\\values";
-//         dealStyleString(path, targetPath);
+        // path = "C:\\workspaces\\App\\res\\values2";
+        // targetPath = "C:\\workspaces\\App\\res\\values";
+        // dealStyleString(path, targetPath);
     }
 
     public static void dealStyleString(String path, String targetPath) {
@@ -70,7 +69,7 @@ public class XMLUtils extends FileUtils {
                         File targetFile = new File(targetPath + "\\" + f.getName());
                         if (!targetFile.exists())
                             targetFile.createNewFile();
-                        dealPadding3(f, targetFile, false);
+                        readAndWrite(f, targetFile, true);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -89,16 +88,11 @@ public class XMLUtils extends FileUtils {
                 @Override
                 public void run() {
                     try {
-                        if(f.isDirectory()){
-                            String pa = targetPath+ "\\" + f.getName();
-                            changeString(f.getName(), pa);
-                            return;
-                        }
                         File targetFile = new File(targetPath + "\\" + f.getName());
                         if (!targetFile.exists())
                             targetFile.createNewFile();
-                        // readAndWrite2(f, targetFile, false);
-                        dealPadding3(f, targetFile, false);
+                        readAndWrite2(f, targetFile, false);
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -274,139 +268,6 @@ public class XMLUtils extends FileUtils {
                     }
                     list.clear();
                 }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null)
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            if (writer != null)
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-        }
-    }
-
-    // 一段一段插入，不会产生重复。
-    public static void dealPadding(File f, File targetFile, boolean isStyle) {
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
-        try {
-            reader = new BufferedReader(new FileReader(f));
-            writer = new BufferedWriter(new FileWriter(targetFile));
-            String line = null;
-            List<String> list = new ArrayList<String>();
-            HashMap<String, String> paddingMap = new HashMap<String, String>();
-            while ((line = reader.readLine()) != null) {
-                list.add(line);
-                if (line.contains(PADDINGLEFT)) {
-                    paddingMap.put(PADDINGLEFT, delString(line));
-                } else if (line.contains(PADDINGRIGHT)) {
-                    paddingMap.put(PADDINGRIGHT, delString(line));
-                }
-                if (line.endsWith(" >") || line.endsWith(">")) {
-                    for (String s : list) {
-                        if (paddingMap.size() < 1) {
-                            writer.write(s);
-                            writer.flush();
-                            writer.newLine();
-
-                        } else {
-                            if (s.contains(PADDINGSTART) || s.contains(PADDINGEND)) {
-                                String left = paddingMap.get(PADDINGLEFT);
-                                String right = paddingMap.get(PADDINGRIGHT);
-                                if (left != null && right != null && left.equals(right)) {
-                                    if (s.contains("/>")) {
-                                        writer.write("/>");
-                                        writer.flush();
-                                        writer.newLine();
-                                    } else if (s.contains(">")) {
-                                        writer.write(">");
-                                        writer.flush();
-                                        writer.newLine();
-                                    }
-                                    continue;
-                                } else {
-                                    writer.write(s);
-                                    writer.flush();
-                                    writer.newLine();
-                                }
-                            } else {
-                                writer.write(s);
-                                writer.flush();
-                                writer.newLine();
-                            }
-                        }
-
-                    }
-                    list.clear();
-                    paddingMap.clear();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null)
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            if (writer != null)
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-        }
-    }
-
-    private static String delString(String str) {
-        String[] line = str.split("=");
-        str = line[1];
-        if (str.endsWith(" />"))
-            str = str.replace(" />", "");
-        else if (str.endsWith("/>"))
-            str = str.replace("/>", "");
-        else if (str.endsWith(" >"))
-            str = str.replace(" >", "");
-        else if (str.endsWith(">"))
-            str = str.replace(">", "");
-        else {}
-        return str;
-    }
-
-    // 一段一段插入，不会产生重复。
-    public static void dealPadding3(File f, File targetFile, boolean isStyle) {
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
-
-        try {
-            reader = new BufferedReader(new FileReader(f));
-            writer = new BufferedWriter(new FileWriter(targetFile));
-            String line = null;
-//            List<String> list = new ArrayList<String>();
-            while ((line = reader.readLine()) != null) {
-                writer.write(line);
-                writer.flush();
-                writer.newLine();
-//                if (line.contains(PADDINGLEFT) || line.contains(PADDINGRIGHT))
-//                    list.add(line);
-//                if (line.contains("</style>")) {
-//                    if(list.size() == 0)
-//                        continue;
-//                    if((list.contains(PADDINGLEFT) && !list.contains(PADDINGRIGHT)) || (!list.contains(PADDINGLEFT) && list.contains(PADDINGRIGHT)))
-//                        System.out.println(targetFile.getName());
-//                }
             }
         } catch (IOException e) {
             e.printStackTrace();
