@@ -15,15 +15,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.wutian.maxy.FileUtils;
+import com.wutian.maxy.FrameStarter;
 
 public class Test {
     public static void main(String[] args) {
-        String path = "C:\\workspaces\\Cloneit\\CloneSDK\\libs\\SmsDaoV2Impl.class";
-        outTime(path);
-        // deal(path, target);
-        File file = new File(path);
-        List<String> strs = readXml(file);
-        writeStrs(file,strs);
+        String resPath = "/Users/maxy/Android/workspace/App/res";
+        String transPath = "/Users/maxy/Downloads/LXQ-0044_4L_Delivery_20161223";
+        FrameStarter listener = new FrameStarter();
+        listener.addTranslateToValues(resPath, transPath, true);
     }
 
     

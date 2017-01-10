@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class FileUtils {
-    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(5);
+    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
 
     public static void copyFile(File originFile, File targetFile) {
         BufferedReader reader = null;
@@ -124,7 +124,7 @@ public class FileUtils {
      * f: values-ar
      * 
      */
-    public static void compareFile(File file, File f, File saveFile, boolean isCompareAr) {
+    public static void compareFile(File originFile, File targetFile, File saveFile, boolean isCompareAr) {
         if (!saveFile.isDirectory())
             return;
         if (!"values".equals(saveFile.getName())) {
@@ -134,19 +134,19 @@ public class FileUtils {
         }
 
         try {
-            saveFile = new File(saveFile, file.getName());
+            saveFile = new File(saveFile, originFile.getName());
             if (!saveFile.exists())
                 saveFile.createNewFile();
         } catch (IOException e) {}
 
-        if (!f.exists()) {
+        if (!targetFile.exists()) {
             try {
-                copyFile(file, saveFile);
-                String valuePaht = file.getParentFile().getParentFile().getAbsolutePath();
-                File zhFile = new File(valuePaht + "\\" + "values-zh-rCN" + "\\" + file.getName());
+                copyFile(originFile, saveFile);
+                String valuePaht = originFile.getParentFile().getParentFile().getAbsolutePath();
+                File zhFile = new File(valuePaht + File.separator + "values-zh-rCN" + File.separator + originFile.getName());
                 if (zhFile.exists()) {
                     valuePaht = saveFile.getParentFile().getParentFile().getAbsolutePath();
-                    File zhTargetFile = new File(valuePaht + "\\" + "values-zh" + "\\" + file.getName());
+                    File zhTargetFile = new File(valuePaht + File.separator + "values-zh" + File.separator + originFile.getName());
                     if (!zhTargetFile.exists())
                         zhTargetFile.createNewFile();
                     copyFile(zhFile, zhTargetFile);
@@ -156,8 +156,8 @@ public class FileUtils {
             }
             return;
         }
-        Map<String, String> originMap = FileUtils.readStringToMap(file);
-        Map<String, String> targetMap = FileUtils.readStringToMap(f);
+        Map<String, String> originMap = FileUtils.readStringToMap(originFile);
+        Map<String, String> targetMap = FileUtils.readStringToMap(targetFile);
         List<String> selectKeys = new ArrayList<String>();
         Set<String> originKeys = originMap.keySet();
         BufferedWriter writer = null;
@@ -199,7 +199,7 @@ public class FileUtils {
         }
 
         if (!selectKeys.isEmpty())
-            tryToAddZhString(file, saveFile.getParentFile().getParentFile(), selectKeys);
+            tryToAddZhString(originFile, saveFile.getParentFile().getParentFile(), selectKeys);
         else
             saveFile.delete();
     }
@@ -298,6 +298,78 @@ public class FileUtils {
         return lines;
     }
 
+    public static void addTransValuesToRes(File valuesFile, File valueXXFile, File translateFile) {
+    	fixedThreadPool.execute(new Runnable() {
+			
+			@Override
+			public void run() {
+                List<String> lines = FileUtils.readXml(valuesFile);
+
+                Map<String, String> transMap = FileUtils.readStringToMap(translateFile);
+                Map<String, String> valueXXMap = FileUtils.readStringToMap(valueXXFile);
+                Map<String, String> copyValueMap = new LinkedHashMap<>(valueXXMap);
+                BufferedWriter writer = null;
+                try{
+                    writer = new BufferedWriter(new FileWriter(valueXXFile));
+                    String defaultValue;
+                    for (String line : lines) {
+                    	 String[] strs = line.trim().split("\">");
+                    	 if (strs.length >=2 && !line.trim().startsWith("<plurals ")) {
+                             String key = strs[0];
+                             defaultValue = null;
+                             if (transMap.containsKey(key)) {
+                            	 defaultValue = transMap.get(key);
+                             } else if (valueXXMap.containsKey(key)){
+                            	 defaultValue = valueXXMap.get(key);
+                             }
+                             
+                             if (copyValueMap.containsKey(key))
+                            	 copyValueMap.remove(key);
+                             if (null == defaultValue && valueXXMap.size() != 0) {
+                                 if (key.contains("translate") || key.contains("translatable") || key.contains("<plurals name="))
+                                	 continue;
+
+                            	 System.out.println(valueXXFile.getName() +  "   don't contains " + key);
+                            	 continue;
+                             }
+                             
+                             writer.write("    " + defaultValue);
+                             writer.flush();
+                             writer.newLine();
+                    	 } else {
+                             writer.write(line);
+                             writer.flush();
+                             writer.newLine();
+                         }
+
+                    }
+                    if (copyValueMap.size() != 0) {
+                        System.out.println("-----------------the below could delete---  -------------------" + valueXXFile.getParentFile().getName());
+
+                    	for (Map.Entry<String,String> entry : copyValueMap.entrySet()){
+                    		if (entry.getKey().contains("<plurals "))
+                    			continue;
+                    		System.out.println("    contains  but values didn't contains   " + entry.getKey()); 
+                    	}
+                    } 
+                    System.out.println();
+                    System.out.println();
+
+                }catch(Exception e) {
+                	
+                }finally{
+                	if (writer != null) {
+                		try {
+							writer.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+                	}
+                }
+			}
+		});
+    }
+
     public static void addTransValuesToRes(File resFile, File translateFile) {
         fixedThreadPool.execute(new Runnable() {
 
@@ -305,7 +377,7 @@ public class FileUtils {
             public void run() {
                 List<String> lines = FileUtils.readXml(resFile);
                 if (lines.isEmpty()) {
-                    File file = new File(resFile.getParentFile().getParentFile().getAbsolutePath() + "\\values\\" + resFile.getName());
+                    File file = new File(resFile.getParentFile().getParentFile().getAbsolutePath() + File.separator +"values"+ File.separator + resFile.getName());
                     if (file.exists())
                         lines = FileUtils.readXml(file);
                 }

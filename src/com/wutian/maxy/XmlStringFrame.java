@@ -56,7 +56,7 @@ public class XmlStringFrame extends JFrame {
 
         createComparePannel(tabbedPane);
 
-        createStandardXMl(tabbedPane);
+//        createStandardXMl(tabbedPane);
         container.add(tabbedPane);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -300,7 +300,7 @@ public class XmlStringFrame extends JFrame {
                 String targetPath = targetFile.getText().trim();
                 if ("".equals(originPath) || "".equals(targetPath))
                     showDirNull();
-                listener.addTranslateToValues(originPath, targetPath);
+				listener.addTranslateToValues(originPath, targetPath, true);
             }
         });
         panel.add(startButton);

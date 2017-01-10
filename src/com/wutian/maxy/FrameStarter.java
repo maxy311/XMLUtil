@@ -50,28 +50,42 @@ public class FrameStarter implements ButtonClickInterface {
      * 
      */
     @Override
-    public void addTranslateToValues(String resPath, String translatePath) {
+    public void addTranslateToValues(String resPath, String translatePath, boolean isNeedSort) {
 
         File originFile = new File(resPath);
         if (!originFile.exists())
             return;
+        
         File translateFile = new File(translatePath);
         if (!translateFile.exists())
             return;
         for (File file : translateFile.listFiles()) {
             if (file.isDirectory()) {
                 File f = new File(originFile, file.getName());
-                if (!f.exists())
-                    continue;
-                addTranslateToValues(f.getAbsolutePath(), file.getAbsolutePath());
+                if (!f.exists()) {
+                	System.out.println(f.getName());
+                	continue;
+                }
+                addTranslateToValues(f.getAbsolutePath(), file.getAbsolutePath(),isNeedSort);
             } else {
                 try {
 					File f = new File(originFile, file.getName());
 					if (!f.exists()) {
 						f.createNewFile();
 						FileUtils.copyFile(file, f);
-					} else
+					} else {
+						if (isNeedSort) {
+							String valuePath = originFile.getParentFile().getAbsolutePath() + File.separator + "values";
+							File valueFile = new File(valuePath, f.getName());
+//							System.out.println(valueFile.getAbsolutePath());
+							if (valueFile == null || !valueFile.exists())
+								FileUtils.addTransValuesToRes(f, file);
+							else
+								FileUtils.addTransValuesToRes(valueFile, f, file);
+						} 
 						FileUtils.addTransValuesToRes(f, file);
+						
+					}
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
