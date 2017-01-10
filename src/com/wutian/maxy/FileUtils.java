@@ -24,7 +24,7 @@ public class FileUtils {
         BufferedWriter writer = null;
 
         try {
-            reader = new BufferedReader(new FileReader(originFile));
+        	reader = new BufferedReader(new FileReader(originFile));
             writer = new BufferedWriter(new FileWriter(targetFile));
             String line = null;
             while (true) {
@@ -173,7 +173,7 @@ public class FileUtils {
                     continue;
                 if (isCompareAr) {
                     // values 与 values-ar 比较
-                    if (targetMap.containsKey(key) && !targetMap.get(key).equals(originMap.get(key)))
+                    if (targetMap.containsKey(key))
                         continue;
                 } else {
                     // values 与 values 比较
@@ -238,7 +238,7 @@ public class FileUtils {
                     writer.flush();
                     writer.newLine();
                 } else
-                    System.out.println("values " + file.getName() + "didn't contains :" + str);
+                    System.out.println("values--zh        " + file.getName() + "     didn't contains :      " + str);
             }
             writer.write("</resources>");
             writer.flush();
@@ -453,7 +453,6 @@ public class FileUtils {
         } catch (Exception e) {
             System.out.println(e.toString());
         } finally {
-
             try {
                 if (writer != null)
                     writer.close();

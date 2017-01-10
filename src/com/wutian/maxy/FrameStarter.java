@@ -66,10 +66,12 @@ public class FrameStarter implements ButtonClickInterface {
                 addTranslateToValues(f.getAbsolutePath(), file.getAbsolutePath());
             } else {
                 try {
-                    File f = new File(originFile, file.getName());
-                    if (!f.exists())
-                        f.createNewFile();
-                    FileUtils.addTransValuesToRes(f, file);
+					File f = new File(originFile, file.getName());
+					if (!f.exists()) {
+						f.createNewFile();
+						FileUtils.copyFile(file, f);
+					} else
+						FileUtils.addTransValuesToRes(f, file);
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
