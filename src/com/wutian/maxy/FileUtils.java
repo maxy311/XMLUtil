@@ -17,7 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class FileUtils {
-    private static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
+    public static ExecutorService fixedThreadPool = Executors.newFixedThreadPool(1);
 
     public static void copyFile(File originFile, File targetFile) {
         BufferedReader reader = null;
@@ -298,13 +298,12 @@ public class FileUtils {
         return lines;
     }
 
-    public static void addTransValuesToRes(File valuesFile, File valueXXFile, File translateFile) {
-    	fixedThreadPool.execute(new Runnable() {
+    public static Future<?> addTransValuesToRes(File valuesFile, File valueXXFile, File translateFile) {
+    	Future<?> future = fixedThreadPool.submit(new Runnable() {
 			
 			@Override
 			public void run() {
                 List<String> lines = FileUtils.readXml(valuesFile);
-
                 Map<String, String> transMap = FileUtils.readStringToMap(translateFile);
                 Map<String, String> valueXXMap = FileUtils.readStringToMap(valueXXFile);
                 Map<String, String> copyValueMap = new LinkedHashMap<>(valueXXMap);
@@ -314,7 +313,8 @@ public class FileUtils {
                     String defaultValue;
                     for (String line : lines) {
                     	 String[] strs = line.trim().split("\">");
-                    	 if (strs.length >=2 && !line.trim().startsWith("<plurals ")) {
+                    	 
+                    	 if (strs.length >=2) {
                              String key = strs[0];
                              defaultValue = null;
                              if (transMap.containsKey(key)) {
@@ -368,10 +368,12 @@ public class FileUtils {
                 }
 			}
 		});
+
+    	return future;
     }
 
-    public static void addTransValuesToRes(File resFile, File translateFile) {
-        fixedThreadPool.execute(new Runnable() {
+    public static Future<?> addTransValuesToRes(File resFile, File translateFile) {
+      Future<?> future = fixedThreadPool.submit(new Runnable() {
 
             @Override
             public void run() {
@@ -419,6 +421,8 @@ public class FileUtils {
                 }
             }
         });
+      
+      return future;
     }
 
     private static void writeMapLeftToXml(BufferedWriter writer, ArrayList<String> temp, Map<String, String> map) throws IOException {

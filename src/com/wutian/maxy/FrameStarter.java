@@ -51,7 +51,6 @@ public class FrameStarter implements ButtonClickInterface {
      */
     @Override
     public void addTranslateToValues(String resPath, String translatePath, boolean isNeedSort) {
-
         File originFile = new File(resPath);
         if (!originFile.exists())
             return;
@@ -59,6 +58,7 @@ public class FrameStarter implements ButtonClickInterface {
         File translateFile = new File(translatePath);
         if (!translateFile.exists())
             return;
+        
         for (File file : translateFile.listFiles()) {
             if (file.isDirectory()) {
                 File f = new File(originFile, file.getName());
@@ -82,9 +82,9 @@ public class FrameStarter implements ButtonClickInterface {
 								FileUtils.addTransValuesToRes(f, file);
 							else
 								FileUtils.addTransValuesToRes(valueFile, f, file);
-						} 
-						FileUtils.addTransValuesToRes(f, file);
-						
+						} else {
+							FileUtils.addTransValuesToRes(f, file);
+						}
 					}
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
@@ -171,6 +171,7 @@ public class FrameStarter implements ButtonClickInterface {
                     });
             futures.add(future);
         }
-        // FileUtils.endThreadPool(fixedThreadPool, futures);
+        System.out.println(futures.size());
+        FileUtils.endThreadPool(fixedThreadPool, futures);
     }
 }
