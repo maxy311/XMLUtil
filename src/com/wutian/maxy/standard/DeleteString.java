@@ -26,8 +26,16 @@ public class DeleteString {
 
     static {
         List<String> ids = new ArrayList<>();
-        ids.add("<string name=\"setting_password_version_info");
-        DELETE_IDS.put("setting_strings.xml", ids);
+        
+        ids.add("<string name=\"cleanit_feed_result_clean_file");
+        ids.add("<string name=\"cleanit_feed_result_clean_apk");
+        ids.add("<string name=\"cleanit_feed_result_manager_apk");
+        ids.add("<string name=\"cleanit_feed_result_scan");
+        ids.add("<string name=\"cleanit_feed_result_clean");
+        ids.add("<string name=\"cleanit_feed_result_manager");
+
+
+        DELETE_IDS.put("cleanit_stringsr.xml", ids);
     }
 
     public static void main(String[] args) {

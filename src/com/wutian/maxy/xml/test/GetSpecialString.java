@@ -24,7 +24,7 @@ public class GetSpecialString {
 
     static {
         
-        mDatas.add("<string name=\"lockit_enter_title");
+        mDatas.add("<string name=\"share_content_category_file_item_text");
         
 //        mDatas.add("<string name=\"cleanit_home_phone_boost");
 //        mDatas.add("<string name=\"cleanit_home_battery_saver");
@@ -34,14 +34,14 @@ public class GetSpecialString {
     public static void main(String[] args) {
         String path = "/Users/maxy/Android/workspace/App/res";
 //        String fileName = "feed_strings.xml";
-        String fileName= "lock_string.xml";
+        String fileName= "share_strings.xml";
         readStringToMap(path, fileName);
-        System.out.println(mMaps.toString());
+//        System.out.println(mMaps.toString());
 //        System.out.println(mMaps.toString());
         File targetFile = new File("/Users/maxy/Desktop/res");
         if (!targetFile.exists())
         	targetFile.mkdir();
-        writeMapToXML(mMaps, targetFile, "lock_strings.xml");
+        writeMapToXML(mMaps, targetFile, "share_strings.xml");
     }
 
     private static void readStringToMap(String path, String fileName) {
@@ -141,15 +141,43 @@ public class GetSpecialString {
         BufferedReader reader = null;
         try {
             reader = new BufferedReader(new FileReader(file));
-            String line = "";
+            StringBuffer sb = new StringBuffer();
+            String line = null;
+            String str = "";
             while ((line = reader.readLine()) != null) {
                 if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->"))
                     continue;
-                String strs[] = line.split("\">");
-                if (strs.length != 2)
-                    continue;
-                if (mDatas.contains(strs[0].trim()))
-                    lines.add(line);
+                if (line.contains("plurals") || line.contains("<item quantity")) {
+                    if (line.contains("plurals")) {
+                        if (line.trim().startsWith("<plurals")) {
+                            str = line.trim().split("\">")[0];
+                            sb.append(line.trim());
+                        } else if (line.trim().startsWith("</plurals>")) {
+                            sb.append("\n" + "    " + line.trim());
+//                            map.put(str, sb.toString());
+                            
+                            lines.add(sb.toString());
+                            
+//                            System.out.println(sb.toString());
+
+                            if ("".equals(str))
+                                System.out.println("errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror");
+                            str = "";
+                            sb.setLength(0);
+                        }
+                    } else if (line.contains("<item quantity")) {
+                        sb.append("\n" + "        " + line.trim());
+//                        System.out.println(line.trim());
+
+                    }
+                 } else {
+                	 String strs[] = line.split("\">");
+                     if (strs.length != 2)
+                         continue;
+                     if (mDatas.contains(strs[0].trim()))
+                         lines.add(line);
+                 } 
+                
             }
         } catch (FileNotFoundException e) {
             return lines;

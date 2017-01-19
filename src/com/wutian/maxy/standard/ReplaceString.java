@@ -31,8 +31,8 @@ public class ReplaceString {
         DELETE_IDS.put("pc_strings.xml", ids);
     }
 
-    public static void main(String[] args) {
-        if (DELETE_ID != null && !DELETE_ID.equals("") && !FILE_NAME.equals("") && FILE_NAME != null)
+	public static void main(String[] args) {
+		if (DELETE_ID != null && !DELETE_ID.equals("") && !FILE_NAME.equals("") && FILE_NAME != null)
             deleteStringInFile(DELETE_ID, FILE_NAME);
         else if (DELETE_IDS != null && DELETE_IDS.size() > 0) {
             deleteString(DELETE_IDS, FILE_NAME);
