@@ -74,7 +74,7 @@ public class FileUtils {
 			String line = null;
 			String str = "";
 			while ((line = reader.readLine()) != null) {
-				if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->"))
+				if (line.contains("<resources>") || line.contains("</resources>") || line.contains("<?xml") || line.endsWith("-->"))
 					continue;
 
 				if (line.contains("plurals") || line.contains("<item quantity")) {

@@ -8,7 +8,8 @@ public class StringOperate {
 	private static String resPath = "/Users/maxy/Android/workspace/App/res";
 
 	public static void main(String[] args) {
-		addTranslateMethod();
+//		addTranslateMethod();
+	    getTranslateMethod();
 	}
 
 	private static void addTranslateMethod() {
@@ -21,8 +22,8 @@ public class StringOperate {
 	 * values values-ar compare
 	 */
 	private static void getTranslateMethod() {
-		String valuePath = resPath + File.pathSeparator + "values";
-		String valuePath_Ar = resPath + File.pathSeparator + "values-ar";
+		String valuePath = resPath + "/" + "values";
+		String valuePath_Ar = resPath + "/" + "values-ar";
 		String savePath = "/Users/maxy/Desktop/res";
 		FrameStarter listener = new FrameStarter();
 		listener.compareFile(valuePath, valuePath_Ar, savePath, true);
