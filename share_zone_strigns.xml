@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="content_add_to_share_zone">新增到分享區</string>
+    <string name="content_my_share_zone">我的分享區</string>
+    <string name="content_my_share_zone_desc">%1$s 個影片、%2$s 個音樂、%3$s 個應用程式</string>
+    <string name="content_delete_from_share_zone">移除檔案</string>
+    <string name="content_create_share_zone_desc">在此享用並且分享免費資源</string>
+    <string name="content_create_share_zone_sub_desc">您和您的朋友都可以將檔案放在分享區。 連線後，您們兩人便可以自行前往分享區進行選擇</string>
+    <string name="content_share_zone_add">新增</string>
+    <string name="content_share_zone_remove">移除</string>
+
+    <string name="share_zone_no_files_to_add">分享區中沒有檔案</string>
+    <string name="share_zone_recommend_add">立即新增</string>
+    <string name="share_zone_recommend_title">若要加入分享區，您需要新增分享檔案</string>
+    <string name="share_zone_recommend_sub_title">我們已經為您選了幾個高品質檔案</string>
+    <string name="share_zone_recommend_select_self">親自選取</string>
+    <string name="share_zone_recommend_whitelist_title">哇~ 您擁有排名前 100 個資源</string>
+    <string name="share_zone_recommend_whitelist_sub_title">新增至分享區，然後分享給朋友</string>
+    <string name="share_zone_progress_title">分享區</string>
+    <string name="share_zone_progress_users_sharezone">%s 的分享區</string>
+    <string name="share_zone_create_share_zone_dialog_msg">若要檢查 %s 的資源，您必須先加入「分享區」。</string>
+    <string name="share_zone_create_share_zone_dialog_cancel_text">以後再說</string>
+    <string name="share_zone_create_share_zone_dialog_ok_text">立即加入</string>
+
+    <string name="share_zone_invite_share_zone_dialog_msg">%s 邀請您加入「分享區」來分享並且享用免費資源。</string>
+    <string name="share_zone_invite_share_zone_dialog_ok_text">@string/share_zone_create_share_zone_dialog_ok_text</string>
+    <string name="share_zone_progress_user_not_support">%s 的應用程式版本不支援「分享區」功能。</string>
+    <string name="share_zone_progress_user_not_support_content">您的應用程式版本不支援檢查 %s 的特定資源。</string>
+    <string name="share_zone_download_selected_files">取得</string>
+    <string name="share_zone_invite_send_success_tip">傳送成功</string>
+
+    <string name="share_zone_invite_another_text">%s 尚未加入分享區</string>
+    <string name="share_zone_titlebar_self_description">我：</string>
+    <string name="content_share_zone_not_enabled">未啟用</string>
+    <string name="share_zone_invite_another_open_text">立即邀請</string>
+
+    <string name="share_zone_feed_uncreate_title1">歡迎加入分享區</string>
+    <string name="share_zone_feed_uncreate_msg1">在此享用並且分享免費資源</string>
+    <string name="share_zone_feed_uncreate_button">立即檢查</string>
+    <string name="share_zone_feed_uncreate_msg3">您可以將檔案放在分享區，這樣您的朋友就可以在連線後自行選擇要下載的檔案。</string>
+    <string name="share_zone_feed_created_add_title">傳輸的 %s 個檔案可以新增到分享區</string>
+    <string name="share_zone_feed_created_add_button">新增到分享區</string>
+
+    <string name="share_zone_first_use_tip_msg">將免費資源分享給朋友</string>
+
+    <string name="share_zone_invite_remote_user_text">邀請 %s 加入</string>
+    <string name="share_zone_invite_remote_user_open_self">在分享區享用並且分享免費資源。</string>
+    <string name="share_zone_follow_user_dlg_title">現在你可以看到有關其他人分享區的更新消息</string>
+    <string name="share_zone_follow_user_dlg_desc">追蹤您的朋友，即可查看他們分享區的更新消息</string>
+    <string name="share_zone_follow_user_check_msg">將我的分享區顯示給朋友</string>
+    <string name="share_zone_follow_user_profile_title">暱稱和大頭貼會顯示在您的朋友分享區中</string>
+    <string name="share_zone_follow_user_change_profile">變更大頭貼</string>
+    <string name="share_zone_follow_user_enter">進入</string>
+    <string name="share_zone_follow_user_failed_info">失敗！ 請檢查您的網路</string>
+    <string name="share_zone_user_status_followed">已追蹤</string>
+    <string name="share_zone_user_status_follow">追蹤</string>
+    <string name="share_zone_user_status_following">追蹤中</string>
+    <string name="share_zone_user_status_unfollow_hint">目前僅支援下列 Android 裝置</string>
+    <string name="share_zone_has_local_wishlist_content">%s 的分享區有您想要的資源</string>
+
+    <string name="share_zone_card_title">他們在分享區中有更新消息</string>
+    <string name="share_zone_load_error">載入失敗 \n 請點選以重試</string>
+    <string name="share_zone_item_update">更新： %s</string>
+    <string name="share_zone_item_invite_button_text">邀請加入</string>
+    <string name="share_zone_invite_msg">%s 尚未加入分享區</string>
+    <string name="share_zone_invite_success_toast">傳送成功</string>
+    <string name="share_zone_invite_failed_toast">無法傳送</string>
+    <string name="share_zone_following">追蹤</string>
+    <string name="share_zone_follow_title">您尚未追蹤任何人</string>
+    <string name="share_zone_follow_user_title">分享區中沒有更新消息</string>
+    <string name="share_zone_follow_msg">追蹤朋友，即可在分享區查看他們的更新消息</string>
+
+    <string name="share_zone_content_wish">我想要</string>
+    <string name="share_zone_content_empty_text">無資源</string>
+    <string name="share_zone_add_wish_dialog_title">已新增到您的願望清單</string>
+    <string name="share_zone_add_wish_dialog_msg">連線後，您便可以取得願望清單上的這些資源</string>
+    <string name="share_zone_invite_open_sz_content">已對其他人隱藏分享區\n 請將它開啟，這樣您的朋友才可以在分享區中查看更新消息。</string>
+    <string name="share_zone_invite_open_sz_cancel">取消</string>
+    <string name="share_zone_invite_open_sz_ok">開啟分享區</string>
+
+    <!-- message -->
+    <string name="share_zone_message_session_title">訊息</string>
+    <string name="share_zone_message_session_likes">讚</string>
+    <string name="share_zone_liked_desc">說您的資源讚</string>
+    <string name="share_zone_liked_info">%s 說您的資源讚</string>
+    <string name="share_zone_like_empty_desc">還沒有人說您的資源讚</string>
+    <string name="share_zone_like_empty_hint">當朋友點選「我想要」時，您的分享區就會得到讚</string>
+    <string name="share_zone_like_empty_sub_hint">若要增加得到更多讚的機率，請將更多優質資源新增至分享區</string>
+    <string name="share_zone_chat_msg_type_unknown">您的應用程式版本不支援此訊息格式。 請更新</string>
+    <string name="share_zone_chat_msg_txt_max_length">您的訊息內容太長， 請縮短。</string>
+
+    <!--notification-->
+    <string name="share_zone_notification_common_content">立即檢查</string>
+    <string name="share_zone_notification_message_title_multi_user">您的 %1$d 個朋友傳送訊息給您</string>
+    <string name="share_zone_notification_like_title_single_user">%1$s 說您分享區中的資源讚</string>
+    <string name="share_zone_notification_like_title_multi_user">您的 %1$d 個朋友說您分享區中的資源讚</string>
+    <string name="share_zone_notification_invite_title_single_user">%1$s 邀請您加入分享區</string>
+    <string name="share_zone_notification_invite_title_multi_user">%1$d 個朋友邀請您參加分享區</string>
+    <string name="share_zone_notification_content_title_single_user">%1$s 在分享區有更新消息</string>
+    <string name="share_zone_notification_content_title_multi_user">您的 %1$d 個朋友在分享區中有更新消息</string>
+</resources>

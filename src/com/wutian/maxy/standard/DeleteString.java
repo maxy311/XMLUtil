@@ -26,16 +26,24 @@ public class DeleteString {
 
     static {
         List<String> ids = new ArrayList<>();
+
+        //
+         ids.add("<string name=\"setting_saving_failed_tip");
+        // ids.add("<string name=\"lockit_enter_dialog_msg_download_common");
+
+        DELETE_IDS.put("setting_strings.xml", ids);
         
-        ids.add("<string name=\"cleanit_feed_result_clean_file");
-        ids.add("<string name=\"cleanit_feed_result_clean_apk");
-        ids.add("<string name=\"cleanit_feed_result_manager_apk");
-        ids.add("<string name=\"cleanit_feed_result_scan");
-        ids.add("<string name=\"cleanit_feed_result_clean");
-        ids.add("<string name=\"cleanit_feed_result_manager");
-
-
-        DELETE_IDS.put("cleanit_stringsr.xml", ids);
+        
+        //
+        ids.add("<string name=\"navigation_rateus_name");
+        ids.add("<string name=\"navigation_games_name");
+       DELETE_IDS.put("navigation_strings.xml", ids);
+       
+       
+       ids.add("<string name=\"feed_mv_list_title");
+       ids.add("<string name=\"feed_mv_triple_title");
+       ids.add("<string name=\"feed_shareit_family_listenit_msg");
+      DELETE_IDS.put("feed_strings.xml", ids);
     }
 
     public static void main(String[] args) {

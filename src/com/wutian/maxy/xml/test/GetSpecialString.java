@@ -24,8 +24,9 @@ public class GetSpecialString {
 
     static {
         
-        mDatas.add("<string name=\"share_content_category_file_item_text");
-        
+        mDatas.add("<string name=\"hotspot_patch_help_msg");
+        mDatas.add("<string name=\"hotspot_patch_help_btn_set");
+
 //        mDatas.add("<string name=\"cleanit_home_phone_boost");
 //        mDatas.add("<string name=\"cleanit_home_battery_saver");
 //        mDatas.add("<string name=\"cleanit_home_app_manager");
@@ -65,7 +66,7 @@ public class GetSpecialString {
             File tarFile = new File(dirs, dir);
             if (!tarFile.exists())
             	tarFile.mkdir();
-            File f = new File(tarFile, fileName);
+            File f = new File(tarFile, "strings.xml");
             if (!f.exists())
 				try {
 					f.createNewFile();
@@ -77,11 +78,15 @@ public class GetSpecialString {
             BufferedWriter writer = null;
 
             try {
+                List<String> data = map.get(dir);
 				writer = new BufferedWriter(new FileWriter(f));
 				System.out.println(map.get(dir).get(0));
-				writer.write(map.get(dir).get(0));
-				writer.flush();
-				writer.newLine();
+				for(String str: data) {
+				    writer.write(str);
+	                writer.flush();
+	                writer.newLine();
+				}
+				
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -145,38 +150,45 @@ public class GetSpecialString {
             String line = null;
             String str = "";
             while ((line = reader.readLine()) != null) {
-                if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->"))
-                    continue;
-                if (line.contains("plurals") || line.contains("<item quantity")) {
-                    if (line.contains("plurals")) {
-                        if (line.trim().startsWith("<plurals")) {
-                            str = line.trim().split("\">")[0];
-                            sb.append(line.trim());
-                        } else if (line.trim().startsWith("</plurals>")) {
-                            sb.append("\n" + "    " + line.trim());
-//                            map.put(str, sb.toString());
-                            
-                            lines.add(sb.toString());
-                            
-//                            System.out.println(sb.toString());
-
-                            if ("".equals(str))
-                                System.out.println("errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror");
-                            str = "";
-                            sb.setLength(0);
-                        }
-                    } else if (line.contains("<item quantity")) {
-                        sb.append("\n" + "        " + line.trim());
-//                        System.out.println(line.trim());
-
-                    }
-                 } else {
-                	 String strs[] = line.split("\">");
-                     if (strs.length != 2)
-                         continue;
-                     if (mDatas.contains(strs[0].trim()))
+//                if (line.contains("resources") || line.contains("<?xml") || line.endsWith("-->"))
+//                    continue;
+//                if (line.contains("plurals") || line.contains("<item quantity")) {
+//                    if (line.contains("plurals")) {
+//                        if (line.trim().startsWith("<plurals")) {
+//                            str = line.trim().split("\">")[0];
+//                            sb.append(line.trim());
+//                        } else if (line.trim().startsWith("</plurals>")) {
+//                            sb.append("\n" + "    " + line.trim());
+////                            map.put(str, sb.toString());
+//                            
+//                            lines.add(sb.toString());
+//                            
+////                            System.out.println(sb.toString());
+//
+//                            if ("".equals(str))
+//                                System.out.println("errorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerrorerror");
+//                            str = "";
+//                            sb.setLength(0);
+//                        }
+//                    } else if (line.contains("<item quantity")) {
+//                        sb.append("\n" + "        " + line.trim());
+////                        System.out.println(line.trim());
+//
+//                    }
+//                 } else {
+//                	 String strs[] = line.split("\">");
+//                     if (strs.length != 2)
+//                         continue;
+//                     if (mDatas.contains(strs[0].trim()))
+//                         lines.add(line);
+                     
+                
+                     if (line.contains(mDatas.get(0)))
                          lines.add(line);
-                 } 
+                     else if (line.contains("hotspot_patch_help_btn_set"))
+                         lines.add(line);
+                     System.out.println(line);
+//                 } 
                 
             }
         } catch (FileNotFoundException e) {

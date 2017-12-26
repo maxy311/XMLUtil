@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,14 +21,67 @@ import com.wutian.maxy.FrameStarter;
 
 public class Test {
     public static void main(String[] args) {
-        String resPath = "/Users/maxy/Android/workspace/App/res";
-        String transPath = "/Users/maxy/Downloads/LXQ-0044_4L_Delivery_20161223";
-        FrameStarter listener = new FrameStarter();
-        listener.addTranslateToValues(resPath, transPath, true);
+        replaceStrig();
     }
 
+    private static void replaceStrig(){
+        String originPath = "/Users/maxy/Downloads/bbbbb/sdcard/logs/logs/stats0_60f0950fddeaea8c1bd8/aplog_boot_BOOT_20170816162703";
+        String resPath = "/Users/maxy/Desktop/sender3.txt";
+        
+       BufferedReader reader = null;
+       BufferedWriter writer = null;
+
+       try {
+           reader = new BufferedReader(new FileReader(originPath));
+           writer = new BufferedWriter(new FileWriter(resPath));
+           String line = null;
+          while(reader.readLine() != null) {
+              line = reader.readLine();
+              if (null == line)
+                  continue;
+              if (line.contains("V AS")
+                      || line.contains("D AS")
+                      || line.contains("I AS")
+                      || line.contains("W AS")
+                      || line.contains("E AS")) {
+                  writer.write(line);
+                  writer.flush();
+                  writer.newLine();
+              }
+          }
+
+       } catch (Exception e) {
+           e.printStackTrace();
+       } finally {
+
+           try{
+               if (reader != null)
+                   reader.close();   
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+
+           try {
+               if (writer != null)
+                   writer.close();
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+       }
+   
+       
+    }
     
-    
+    private static void rename() {
+       String path = "/Users/maxy/Android/workspace/App/res";
+       File file = new File(path);
+       
+        for (File f : file.listFiles()) {
+            File f1 = new File(f, "share_zone_strigns.xml");
+            File f2 = new File(f,"share_zone_strings.xml");
+            f1.renameTo(f2);
+        }
+    }
     private static void writeStrs(File file, List<String> strs) {
 
         BufferedWriter writer = null;
